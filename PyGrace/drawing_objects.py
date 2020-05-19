@@ -1,4 +1,4 @@
-from base import GraceObject 
+from .base import GraceObject
 
 DRAWTEXT_JUSTIFICATIONS = {"l":0,
                            "r":1,
@@ -39,7 +39,7 @@ class DrawingObject(GraceObject):
         elif isinstance(self.parent, graph.Graph):
             self._linked_graph = self.parent.index
         elif self.parent == None:
-            self._linked_graph = None            
+            self._linked_graph = None
         else:
             message = 'parent of drawing object (%s) is not graph or grace.' %\
                       type(self.parent)
@@ -59,7 +59,7 @@ class DrawingObject(GraceObject):
         DrawingObject for autoscale features to work properly.
         """
         pass
-        
+
     def smallest_positive(self):
         """Find the smallest positive coordinate of each drawing
         object.
@@ -73,8 +73,8 @@ class DrawingObject(GraceObject):
             y = ymin
         else:
             y = None
-        return x,y        
-        
+        return x,y
+
 class DrawBox(DrawingObject):
     def __init__(self, parent,
                  onoff = 'on',
@@ -104,7 +104,7 @@ class DrawBox(DrawingObject):
 @    box fill color %(fill_color)s
 @    box fill pattern %(fill_pattern)s
 @box def""" % self
-            
+
     def limits(self):
         """Find the limits of a DrawBox for autoscaling axes (among
         other things?)
@@ -141,7 +141,7 @@ class DrawText(DrawingObject):
 @    string just %(just)s
 @    string char size %(char_size)s
 @string def "%(text)s" """ % self
-        
+
     def limits(self):
         """Find the limits of a DrawBox for autoscaling axes (among
         other things?)
@@ -187,7 +187,7 @@ class DrawLine(DrawingObject):
             self._check_type(tuple, key, value)
             self._check_range(key, value[0], 0, None)
             self._check_range(key, value[1], 0, 1, includeMax=True)
-            
+
         GraceObject.__setattr__(self, key, value)
 
     def __str__(self):

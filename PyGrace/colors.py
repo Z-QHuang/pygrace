@@ -1,7 +1,7 @@
 import random
 
-from base import BaseSet
-from Styles.ColorBrewer import colorbrewer
+from .base import BaseSet
+from .Styles.ColorBrewer import colorbrewer
 
 class Color(object):
     """Object that stores a mapping between an index an a name for a color,
@@ -32,7 +32,7 @@ class Color(object):
             alpha *= percent / 100.
             new_rgb.append((1. - alpha) * 255.)
         self.red, self.green, self.blue = new_rgb
-            
+
 
 class ColorScheme(BaseSet):
     """This subclass of the base set has a method that checks for conflicts
@@ -48,7 +48,7 @@ class ColorScheme(BaseSet):
                 message += ' ' * 12 + "old (%i, %i, %i)" % color.rgb()
                 message += " != new (%i, %i, %i)" % (red, green, blue)
                 raise ValueError(message)
-            
+
     def change_opacity(self, percent, exclude_black=False):
         for color in self.items:
             if exclude_black and (color.red,color.green,color.blue)==(0,0,0):

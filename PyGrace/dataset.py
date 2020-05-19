@@ -1,4 +1,5 @@
-from base import GraceObject
+from .base import GraceObject
+import six
 
 SYMBOLS = {"None":0,
            "Circle":1,
@@ -14,7 +15,7 @@ SYMBOLS = {"None":0,
            "Char":11,
            }
 INDEX2SYMBOLS = {}
-for name,index in SYMBOLS.iteritems():
+for name,index in six.iteritems(SYMBOLS):
     INDEX2SYMBOLS[index] = name
 LINETYPES = {"None":0,
              "Straight":1,
@@ -23,7 +24,7 @@ LINETYPES = {"None":0,
              "Segments":4,
              "3-Segments":5}
 INDEX2LINETYPES = {}
-for name,index in LINETYPES.iteritems():
+for name,index in six.iteritems(LINETYPES):
     INDEX2LINETYPES[index] = name
 LINESTYLES = {"None":0,
               "--":1,
@@ -35,7 +36,7 @@ LINESTYLES = {"None":0,
               ". . - . . - ":7,
               "- - . - - . ":8}
 INDEX2LINESTYLES = {}
-for name,index in LINESTYLES.iteritems():
+for name,index in six.iteritems(LINESTYLES):
     INDEX2LINESTYLES[index] = name
 
 class Symbol(GraceObject):
@@ -103,7 +104,7 @@ class Line(GraceObject):
         if key == 'type':
             self._check_type(int, key, value)
             self._check_range(key, value, 0, 6, includeMax=False)
-            
+
         GraceObject.__setattr__(self, key, value)
 
     def __str__(self):
@@ -114,7 +115,7 @@ class Line(GraceObject):
 @    s%(index)s line linewidth %(linewidth)s
 @    s%(index)s line color %(color)s
 @    s%(index)s line pattern %(pattern)s""" % self
-    
+
 class Baseline(GraceObject):
     _staticType = 'BaseLine'
     def __init__(self, parent,
@@ -130,7 +131,7 @@ class Baseline(GraceObject):
         if key == 'type':
             self._check_type(int, key, value)
             self._check_range(key, value, 0, 6, includeMax=False)
-            
+
         GraceObject.__setattr__(self, key, value)
 
     def __str__(self):
@@ -159,9 +160,9 @@ class Fill(GraceObject):
         elif key == 'rule':
             self._check_type(int, key, value)
             self._check_range(key, value, 0, 1)
-            
+
         GraceObject.__setattr__(self, key, value)
-        
+
     def __str__(self):
         self.index = self.parent.index
         return \
@@ -195,9 +196,9 @@ class AnnotatedValue(GraceObject):
         if key == 'type':
             self._check_type(int, key, value)
             self._check_range(key, value, 0, 6, includeMax=False)
-            
+
         GraceObject.__setattr__(self, key, value)
-        
+
     def __str__(self):
         self.index = self.parent.index
         return \
@@ -212,7 +213,7 @@ class AnnotatedValue(GraceObject):
 @    s%(index)s avalue prepend "%(prepend)s"
 @    s%(index)s avalue append "%(append)s"
 @    s%(index)s avalue offset %(offset)s""" % self
-               
+
 class ErrorBar(GraceObject):
     _staticType = 'ErrorBar'
     def __init__(self, parent,
@@ -242,7 +243,7 @@ class ErrorBar(GraceObject):
             self._check_range(key, value, 0, None)
 
         GraceObject.__setattr__(self, key, value)
-        
+
     def __str__(self):
         self.index = self.parent.index
         return \
@@ -278,9 +279,9 @@ class DataSet(GraceObject):
 
     def __setattr__(self, key, value):
 
-        DATA_TYPES = ('xy', 'xydx', 'xydy', 'xydxdy', 'xydydy', 
+        DATA_TYPES = ('xy', 'xydx', 'xydy', 'xydxdy', 'xydydy',
                       'xydxdx', 'xydxdxdydy', 'bar', 'bardy', 'bardydy',
-                      'xyhilo', 'xyz', 
+                      'xyhilo', 'xyz',
 #                       'xyr', # apparently unsupported
                       'xysize', 'xycolor',
 #                       'xycolpat', # xmgrace does not support
@@ -297,7 +298,7 @@ class DataSet(GraceObject):
             self._check_type(str, key, value)
         elif key == 'legend':
             self._check_type(str, key, value)
-            
+
         GraceObject.__setattr__(self, key, value)
 
     def __str__(self):
@@ -407,12 +408,12 @@ class DataSet(GraceObject):
                 message = """
 Can not find limits of DataSet with type %s
 """%self.type
-                raise TypeError, message
+                raise TypeError(message)
         return x,y
 
     def limits(self,only_visible=True):
         if self.data:
-            if ((only_visible and self.hidden=="false") 
+            if ((only_visible and self.hidden=="false")
                 or not only_visible):
                 x, y = self.data_bounds()
                 return min(x), min(y), max(x), max(y)
@@ -420,7 +421,7 @@ Can not find limits of DataSet with type %s
 
     def smallest_positive(self,only_visible=True):
         if self.data:
-            if ((only_visible and self.hidden=="false") 
+            if ((only_visible and self.hidden=="false")
                 or not only_visible):
                 x, y = self.data_bounds()
                 x = [i for i in x if i > 0]

@@ -1,8 +1,8 @@
-from base import GraceObject
-from drawing_objects import DrawingObject
-from dataset import DataSet, SYMBOLS, INDEX2SYMBOLS, LINESTYLES, \
+from .base import GraceObject
+from .drawing_objects import DrawingObject
+from .dataset import DataSet, SYMBOLS, INDEX2SYMBOLS, LINESTYLES, \
     INDEX2LINESTYLES
-from axis import Axis,LINEAR_SCALE,LOGARITHMIC_SCALE
+from .axis import Axis,LINEAR_SCALE,LOGARITHMIC_SCALE
 import math
 
 INDEX_ORIGIN = 0  # zero or one (one is for losers)
@@ -161,9 +161,9 @@ class Legend(GraceObject):
             self._check_membership(key, value, ('true', 'false'))
         elif key == 'hgap' or key == 'vgap':
             self._check_type((float, int), key, value)
-            
+
         GraceObject.__setattr__(self, key, value)
-      
+
     def __str__(self):
         return \
 """@    legend %(onoff)s
@@ -267,7 +267,7 @@ class Graph(GraceObject):
         if not issubclass(cls, DrawingObject):
             message = '%s is not a subclass of DrawingObject' % cls.__name__
             raise TypeError(message)
-        
+
         # here, the class argument is mandatory, because there are many built
         # in types of drawing objects
         drawingObject = cls(self, *args, **kwargs)
@@ -289,14 +289,14 @@ class Graph(GraceObject):
                 new_dos.append(do)
             else:
                 do_xmin,do_ymin,do_xmax,do_ymax = do.limits()
-                if (xmin<=do_xmin and do_xmax<=xmax and 
+                if (xmin<=do_xmin and do_xmax<=xmax and
                     ymin<=do_ymin and do_ymax<=ymax):
                     new_dos.append(do)
                 else:
                     old_dos.append(do)
         self.drawing_objects = new_dos
         for do in old_dos:
-            del do                
+            del do
 
     def alldata(self):
         result = []
@@ -328,7 +328,7 @@ class Graph(GraceObject):
             dataset.index = index + INDEX_ORIGIN
 
     def move_dataset_forward(self, dataset):
-        """Move data set forward by one dataset.  This emulates the 
+        """Move data set forward by one dataset.  This emulates the
         functionality of the xmgrace GUI.
         """
 
@@ -340,14 +340,14 @@ class Graph(GraceObject):
             dataset.index = index + INDEX_ORIGIN
 
     def move_dataset_backward(self, dataset):
-        """Move data set backward by one dataset.  This emulates the 
+        """Move data set backward by one dataset.  This emulates the
         functionality of the xmgrace GUI.
         """
 
         _dataset = self.datasets.pop(dataset.index-INDEX_ORIGIN)
         _index = _dataset.index
         assert _dataset==dataset, "Not the same dataset"
-        _newListIndex = max(0, _index-INDEX_ORIGIN-1) 
+        _newListIndex = max(0, _index-INDEX_ORIGIN-1)
         self.datasets.insert(_newListIndex, dataset)
         for index,dataset in enumerate(self.datasets):
             dataset.index = index + INDEX_ORIGIN
@@ -388,7 +388,7 @@ class Graph(GraceObject):
             return min(xmins), min(ymins)
         else:
             return None, None
-        
+
     def drawing_object_smallest_positive(self):
         all = []
         for drawing_object in self.drawing_objects:
@@ -402,7 +402,7 @@ class Graph(GraceObject):
             return min(xmins), min(ymins)
         else:
             return None, None
-        
+
     def smallest_positive(self,only_visible=True):
         data_sp = self.data_smallest_positive(only_visible=only_visible)
         drawing_object_sp = self.drawing_object_smallest_positive()
@@ -419,8 +419,8 @@ In Graph.smallest_positive()...
 There are no datasets or drawing_objects on which to determine the
 smallest positive number.
 """
-            raise TypeError, message
-        
+            raise TypeError(message)
+
     def data_limits(self,only_visible=True):
         all = []
         for dataset in self.datasets:
@@ -460,7 +460,7 @@ smallest positive number.
 In Graph.limits()...
 There are no datasets or drawing_objects on which to determine the limits.
 """
-            raise TypeError, message
+            raise TypeError(message)
 
     def set_world_to_limits(self, epsilon=1e-12):
         xmin, ymin, xmax, ymax = self.limits()
@@ -468,10 +468,10 @@ There are no datasets or drawing_objects on which to determine the limits.
         self.world.xmax = xmax + epsilon
         self.world.ymin = ymin - epsilon
         self.world.ymax = ymax + epsilon
-        
+
     def autoscale_old(self):
         self.set_world_to_limits()
-        
+
     def set_view(self, xmin, ymin, xmax, ymax):
         self.view.xmin = xmin
         self.view.xmax = xmax
@@ -485,7 +485,7 @@ There are no datasets or drawing_objects on which to determine the limits.
                 self.view.ymax)
 
     def set_labels(self, xLabel, yLabel):
-        self.xaxis.label.text = xLabel 
+        self.xaxis.label.text = xLabel
         self.yaxis.label.text = yLabel
 
     def get_dataset(self,num):
@@ -496,7 +496,7 @@ There are no datasets or drawing_objects on which to determine the limits.
 
     def calculate_ticks(self, iMin, iMax,
                         lowTarget=3, highTarget=7, scale=LINEAR_SCALE):
-        
+
         # variables
         n1s = [1,2,10,20]
         n4s = [5,50]
@@ -507,14 +507,14 @@ There are no datasets or drawing_objects on which to determine the limits.
             domain = iMin, iMax
         if scale == LOGARITHMIC_SCALE:
             domain = math.log10(iMin), math.log10(iMax)
-        
+
         # determine appropriate scale for ticks
         iRange = domain[1] - domain[0]
         if iRange > 0:
             _scale = int(math.floor(math.log10(iRange) - 1.0))
         else:
             _scale = 0
-            
+
 
         # find number of major ticks
         for n in ns:
@@ -599,7 +599,7 @@ There are no datasets or drawing_objects on which to determine the limits.
             # if x has a zero value, autoscale with second smallest
             if xMin <= 0:
                 xMin, dummy = self.smallest_positive(only_visible=only_visible)
-            
+
             xMajor, nxMinor = self.calculate_ticks(xMin, xMax,
                                                    scale=LOGARITHMIC_SCALE)
             self.world.xmax = 10**(math.ceil(math.log10(xMax) /
@@ -687,7 +687,7 @@ There are no datasets or drawing_objects on which to determine the limits.
     def set_different_colors(self, skip=1, attr='name', exclude=('White',),
                              colorsList=[]):
         """Set datasets in graph to different colors.  This function behaves
-        similarly to the similar function in the xmgrace GUI.  Can 
+        similarly to the similar function in the xmgrace GUI.  Can
         alternatively specify a list of colors for ordering the colors.
         """
 
@@ -710,7 +710,7 @@ There are no datasets or drawing_objects on which to determine the limits.
             for color in self.root.colors:
                 if not (color.name.upper() in lookup or color.index in lookup):
                     colorsList.append(getattr(color, attr))
-                
+
         # set datasets to different colors
         nColors = len(colorsList)
         for index, dataset in enumerate(self.datasets):
@@ -746,7 +746,7 @@ There are no datasets or drawing_objects on which to determine the limits.
             for index in indices:
                 if index not in lookup:
                     symbolsList.append(index)
-        
+
         # set datasets to different symbols
         nSymbols = len(symbolsList)
         for index, dataset in enumerate(self.datasets):
@@ -757,7 +757,7 @@ There are no datasets or drawing_objects on which to determine the limits.
                                  linestylesList=[]):
         """Set datasets in graph to different linestyles.  This function
         behaves similarly to the similar function in the xmgrace
-        GUI.  Can alternatively specify a list of linestyles for ordering the 
+        GUI.  Can alternatively specify a list of linestyles for ordering the
         line styles.
         """
 
@@ -782,7 +782,7 @@ There are no datasets or drawing_objects on which to determine the limits.
             for index in indices:
                 if index not in lookup:
                     linestylesList.append(index)
-        
+
         # set datasets to different line styles
         nLinestyles = len(linestylesList)
         for index, dataset in enumerate(self.datasets):
@@ -797,9 +797,9 @@ There are no datasets or drawing_objects on which to determine the limits.
 
         # determine linewidths
         if not linewidthsList:
-            linewidthsList = [skip*index+start 
+            linewidthsList = [skip*index+start
                               for index in range(len(self.datasets))]
-        
+
         # set datasets to different line widths
         for index, dataset in enumerate(self.datasets):
             dataset.line.set_suffix(linewidthsList[index], "linewidth")

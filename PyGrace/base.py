@@ -1,4 +1,5 @@
 import sys
+import six
 
 NAMED_CHILD_TYPES = dict.fromkeys(
     ['Timestamp', 'Legend', 'Frame', 'xAxis', 'yAxis', 'altxAxis', 'altyAxis',
@@ -20,13 +21,13 @@ class GraceObject(object):
     In addition, the parents and children of each object are recorded, so that
     all objects in a tree can access each other."""
     def __init__(self, parent, attrs, *args, **kwargs):
-        
+
         # set all key, value pairs in attrs to attributes of self
         self._set_kwargs_attributes(attrs)
 
         # link object to parent, root, and children
         self._link(parent)
-                            
+
         # this dictionary holds any special string formatting commands for each
         # attribute
         self._formatting_template = {}
@@ -37,20 +38,20 @@ class GraceObject(object):
 
         # parent gets set in a separate function (and self doesn't need it)
         for reserved in ['self', 'parent', 'kwargs']:
-            if attrDict.has_key(reserved):
+            if reserved in attrDict:
                 del attrDict[reserved]
 
-        for key, value in attrDict.iteritems():
+        for key, value in six.iteritems(attrDict):
             setattr(self, key, value)
 
         # store default formatting attributes for later use
         for nonformat in ['index', 'data', 'colors']:
-            if attrDict.has_key(nonformat):
+            if nonformat in attrDict:
                 del attrDict[nonformat]
 
         # remove duplicates
         self._defaultAttributes = dict.fromkeys(attrDict.keys())
-        
+
     def _link(self, parent):
         """If there is no parent, set self as root.  Otherwise, record who the
         parent and the root of the tree are.  Also, this records self in the
@@ -90,14 +91,14 @@ class GraceObject(object):
                 raise TypeError(message)
 
     def children(self):
-        
+
         # put named children alphabetically first in list
-        result = [child for (name, child) 
-                  in sorted(self._namedChildren.iteritems())]
-        
+        result = [child for (name, child)
+                  in sorted(six.iteritems(self._namedChildren))]
+
         # loop through dynamic children types in order
         for childType in DYNAMIC_CHILD_TYPES:
-            if self._dynamicChildren.has_key(childType):
+            if childType in self._dynamicChildren:
                 result.extend(self._dynamicChildren[childType])
 
         return result
@@ -155,7 +156,7 @@ class GraceObject(object):
         else:
             passMax = True
             max_ = '+inf'
-            
+
         # throw an informative error if it fails either one
         if not (passMin and passMax):
             message = '%s does not satisfy %s %s %s %s %s' % \
@@ -236,10 +237,10 @@ class GraceObject(object):
         elif key == 'place':
             self._check_type(str, key, value)
             self._check_membership(key, value, ('normal', 'opposite', 'both'))
-            
+
         # actually set the value of the attribute here
         object.__setattr__(self, key, value)
-        
+
     def __getitem__(self, key):
         """Always returns a formatted string representation of an attribute
         by checking in self._formatting_template"""
@@ -288,7 +289,7 @@ class GraceObject(object):
         except KeyError:
             message = "'%s' font is not defined" % value
             raise KeyError(message)
-            
+
     def _format_color(self, value):
         """Throw error if color is not defined, otherwise return string
         representation of color (either integer or quoted string)"""
@@ -299,12 +300,12 @@ class GraceObject(object):
             raise KeyError(message)
 
     def configure(self, **kwargs):
-        for attr, value in kwargs.iteritems():
+        for attr, value in six.iteritems(kwargs):
             setattr(self, attr, value)
 
     def configure_group(self, *args, **kwargs):
         for arg in args:
-            for attr, value in kwargs.iteritems():
+            for attr, value in six.iteritems(kwargs):
                 setattr(arg, attr, value)
 
     def scale_suffix(self, value, suffix, all=True):
@@ -385,7 +386,7 @@ class GraceObject(object):
                 else:
                     complete = True
             self.copy_format(x, all=all)
-            
+
         # other is an instance of a class
         else:
 
@@ -394,7 +395,7 @@ class GraceObject(object):
                 setattr(self, attr, getattr(other, attr))
 
             if all:
-                for thisChild, thatChild in zip(self.children(), 
+                for thisChild, thatChild in zip(self.children(),
                                                 other.children()):
                     thisChild.copy_format(thatChild)
 
@@ -425,7 +426,7 @@ class GraceObject(object):
                 # FIX: THIS COULD ALSO MAKE A DISTINCTION BETWEEN DEFAULT
                 # ATTRIBUTES AND "CUSTOM" ONES, BY LOOKING IN THE
                 # _defaultAttributes dictionary
-                    
+
         # remove duplicates and sort each list
         methodList = dict.fromkeys(methodList).keys()
         methodList.sort()
@@ -476,10 +477,10 @@ class GraceObject(object):
         # if it appears the same number of times as there are total classes,
         # then it must be common to all classes, so add to global list
         globalMethodList, globalAttrList = [], []
-        for (method, count) in methodCount.iteritems():
+        for (method, count) in six.iteritems(methodCount):
             if count == len(sorted):
                 globalMethodList.append(method)
-        for (attr, count) in attrCount.iteritems():
+        for (attr, count) in six.iteritems(attrCount):
             if count == len(sorted):
                 globalAttrList.append(attr)
 
@@ -543,7 +544,7 @@ class GraceObject(object):
         result.append(r'\vspace{0.5em}')
 
         for cls, mdl, methodList, attrList in globalRemoved:
-            
+
             result.append(r'\hrule')
             result.append(head % (cls, mdl))
             result.append( r'\begin{itemize}')
@@ -563,7 +564,7 @@ class GraceObject(object):
                 result.append(r'\end{itemize}')
 
             result.append( r'\end{itemize}')
-            
+
         result.append(r'\end{multicols}')
         result.append(r'\end{document}')
 
@@ -628,7 +629,7 @@ class BaseSet(object):
         self._index += 1
         self.name2item[item.name] = item
         self.index2item[item.index] = item
-        return item    
+        return item
 
     def get_item_by_index(self, index):
         try:

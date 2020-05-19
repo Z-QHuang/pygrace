@@ -1,11 +1,11 @@
 import time
 import os
 
-from base import GraceObject
-from graph import Graph
-from drawing_objects import DrawingObject
-from colors import DefaultColorScheme
-from fonts import default as default_fonts
+from .base import GraceObject
+from .graph import Graph
+from .drawing_objects import DrawingObject
+from .colors import DefaultColorScheme
+from .fonts import default as default_fonts
 
 HEADER_COMMENT = '# Amaral Group python interface for xmgrace. OH YEAH!'
 INDEX_ORIGIN = 0  # zero or one (one is for losers)
@@ -14,26 +14,26 @@ class Grace(GraceObject):
     def __init__(self,
                  width=792,
                  height=612,
-		 background_color=0,
+                 background_color=0,
                  background_fill='off',
                  version='50114',
                  verbose=False,
                  colors=None,
                  **kwargs
-		 ): 
+    ):
         GraceObject.__init__(self, None, locals())
 
-	self.timestamp = Timestamp(self)
+        self.timestamp = Timestamp(self)
 
         # set these first, so that children inherit this color scheme
         self.colors = colors or DefaultColorScheme()
         self.fonts = default_fonts
 
         self._graphIndex = INDEX_ORIGIN
-	self.graphs = []
+        self.graphs = []
 
         self.drawing_objects = []
-        
+
         # maximum frame ratios in viewport units
         self.get_canvas_dimensions()
 
@@ -50,14 +50,14 @@ class Grace(GraceObject):
         elif key == 'background_fill':
             self._check_type(str, key, value)
             self._check_membership(key, value, ('on', 'off'))
-            
+
         GraceObject.__setattr__(self, key, value)
-        
+
     def set_portrait(self):
         self.width = 612
         self.height = 792
         return 1.0, 792.0 / 612.0
-    
+
     def set_landscape(self):
         self.width = 792
         self.height = 612
@@ -87,16 +87,16 @@ class Grace(GraceObject):
         lines.append(str(self.fonts))
         lines.append(str(self.colors))
         lines.append('@background color %s' % self.background_color)
-	lines.append(str(self.timestamp))
+        lines.append(str(self.timestamp))
         return '\n'.join(lines)
-    
+
     def __str__(self):
         lines = []
         lines.append('# Grace project file')
         lines.append(HEADER_COMMENT)
-	lines.append(self._header_string())
+        lines.append(self._header_string())
         lines.extend(map(str, self.drawing_objects))
-	lines.extend(map(str, self.graphs))
+        lines.extend(map(str, self.graphs))
         for graph in self.graphs:
             for dataset in graph.datasets:
                 lines.append('@target G%i.S%i' % (graph.index, dataset.index))
@@ -112,11 +112,11 @@ class Grace(GraceObject):
         # format filename (include the correct file extension)
         if not filename.split('.')[-1].upper() == 'AGR':
             filename = filename + '.agr'
-        
+
         # write file
-	outfile = open(filename,'w')
-	outfile.write(str(self))
-	outfile.close()
+        outfile = open(filename,'w')
+        outfile.write(str(self))
+        outfile.close()
 
     def write_file(self, filename='temp.eps', filetype=None):
         """write_file(filename='temp.eps', filetype=None) -> none.
@@ -160,7 +160,7 @@ file name.  In this case, Grace.write_file does not recognize the file
 type of file '%s'.  Please specify the gracebat file type manually
 using the 'filetype' keyword argument.
 """%(filename)
-            raise TypeError, message
+            raise TypeError(message)
 
         # make command that will be piped to
         command = 'gracebat -hardcopy -hdevice %s -printfile "%s" -pipe' % \
@@ -177,7 +177,7 @@ using the 'filetype' keyword argument.
     def add_color(self, red, green, blue, name=None):
         color = self.colors.add_color(red, green, blue, name)
         return color
-        
+
     def add_graph(self, cls=Graph, *args, **kwargs):
 
         # make sure that cls is a subclass of Graph
@@ -206,7 +206,7 @@ using the 'filetype' keyword argument.
         clone = self.add_graph(Graph,*args,**kwargs)
         clone.copy_format(graph)
         return clone
-                
+
     def add_drawing_object(self, cls, *args, **kwargs):
 
         # make sure that cls is a subclass of DrawingObject
@@ -246,7 +246,7 @@ using the 'filetype' keyword argument.
         return eps_frame_coords
 
     #--------------------------------------------------------------------------
-    # methods for rescaling graphs 
+    # methods for rescaling graphs
     #--------------------------------------------------------------------------
     def autoscale(self, padx=0,pady=0):
         for graph in self.graphs:
@@ -256,13 +256,13 @@ using the 'filetype' keyword argument.
         """Autoscale all x-axes to have the same world coordinates
         """
 
-        # make sure none of the graphs 
+        # make sure none of the graphs
         if graphs and exclude_graphs:
-            message = """keyword arguments 'graphs' and 'exclude_graphs' 
+            message = """keyword arguments 'graphs' and 'exclude_graphs'
 can not be used simultaneously.
 """
-            raise TypeError,message
-        
+            raise TypeError(message)
+
         # only autoscale these graphs
         if graphs:
             graphs = set(graphs)
@@ -279,7 +279,7 @@ can not be used simultaneously.
         for graph in graphs:
             graph.autoscalex(pad=pad)
             worlds.append(graph.get_world())
-        
+
         # find the least restrictive world coordinates to share for
         # all graphs
         xmins,ymins,xmaxs,ymaxs = zip(*worlds)
@@ -297,13 +297,13 @@ can not be used simultaneously.
         """Autoscale all y-axes to have the same world coordinates
         """
 
-        # make sure none of the graphs 
+        # make sure none of the graphs
         if graphs and exclude_graphs:
-            message = """keyword arguments 'graphs' and 'exclude_graphs' 
+            message = """keyword arguments 'graphs' and 'exclude_graphs'
 can not be used simultaneously.
 """
-            raise TypeError,message
-        
+            raise TypeError(message)
+
         # only autoscale these graphs
         if graphs:
             graphs = set(graphs)
@@ -320,7 +320,7 @@ can not be used simultaneously.
         for graph in graphs:
             graph.autoscaley(pad=pad)
             worlds.append(graph.get_world())
-        
+
         # find the least restrictive world coordinates to share for
         # all graphs
         xmins,ymins,xmaxs,ymaxs = zip(*worlds)

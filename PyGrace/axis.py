@@ -1,11 +1,11 @@
-import base
+from .base import GraceObject
 import sys
 import math
 
 LINEAR_SCALE = "Normal"
 LOGARITHMIC_SCALE = "Logarithmic"
 
-class AxisBar(base.GraceObject):
+class AxisBar(GraceObject):
     _staticType = 'AxisBar'
     def __init__(self, parent,
                  onoff='on',
@@ -14,7 +14,7 @@ class AxisBar(base.GraceObject):
                  linewidth=2,
                  **kwargs
                  ):
-        base.GraceObject.__init__(self, parent, locals())
+        GraceObject.__init__(self, parent, locals())
 
     def __str__(self):
         self.orientation = self.parent.orientation
@@ -25,7 +25,7 @@ class AxisBar(base.GraceObject):
 @    %(alt)s%(orientation)saxis bar linestyle %(linestyle)s
 @    %(alt)s%(orientation)saxis bar linewidth %(linewidth)s""" % self
 
-class AxisLabel(base.GraceObject):
+class AxisLabel(GraceObject):
     _staticType = 'AxisLabel'
     def __init__(self, parent,
                  text='',
@@ -38,7 +38,7 @@ class AxisLabel(base.GraceObject):
                  place_tup=(0, 0.08),
                  **kwargs
                  ):
-        base.GraceObject.__init__(self, parent, locals())
+        GraceObject.__init__(self, parent, locals())
         self._formatting_template = {'place_tup': '%.20f, %.20f'}
 
     def __setattr__(self, key, value):
@@ -48,8 +48,8 @@ class AxisLabel(base.GraceObject):
             self._check_type(str, key, value)
         elif key == 'layout':
             self._check_type(str, key, value)
-            
-        base.GraceObject.__setattr__(self, key, value)
+
+        GraceObject.__setattr__(self, key, value)
 
     def __str__(self):
         self.orientation = self.parent.orientation
@@ -63,8 +63,8 @@ class AxisLabel(base.GraceObject):
 @    %(alt)s%(orientation)saxis label color %(color)s
 @    %(alt)s%(orientation)saxis label char size %(char_size)s
 @    %(alt)s%(orientation)saxis label font %(font)s""" % self
-            
-class Tick(base.GraceObject):
+
+class Tick(GraceObject):
     _staticType = 'Tick'
     def __init__(self, parent,
                  onoff='on',
@@ -92,7 +92,7 @@ class Tick(base.GraceObject):
                  spec_labeldefault='',
                  **kwargs
                  ):
-        base.GraceObject.__init__(self, parent, locals())
+        GraceObject.__init__(self, parent, locals())
 
     def __setattr__(self, key, value):
 
@@ -129,7 +129,7 @@ class Tick(base.GraceObject):
             self._check_type(str, key, value)
             self._check_membership(key, value, ('none', 'ticks', 'both'))
 
-        base.GraceObject.__setattr__(self, key, value)
+        GraceObject.__setattr__(self, key, value)
 
     def __str__(self):
 
@@ -197,12 +197,12 @@ class Tick(base.GraceObject):
     def set_spec_ticks(self,major_ticks,minor_ticks,tick_labels=[]):
         """Set special ticks and tick labels in an intuitive manner.
         """
-        
+
         if len(tick_labels)>0 and len(tick_labels)!=len(major_ticks):
             message = """
 Tick.set_spec_ticks expects tick_labels list to be the same size as major_ticks.
 """
-            raise TypeError,message
+            raise TypeError(message)
 
         if len(tick_labels)>0:
             self.spec_type = "both"
@@ -212,7 +212,7 @@ Tick.set_spec_ticks expects tick_labels list to be the same size as major_ticks.
         self.spec_ticktypes = ["major"]*len(major_ticks) + ["minor"]*len(minor_ticks)
         self.spec_ticks = major_ticks + minor_ticks
 
-class TickLabel(base.GraceObject):
+class TickLabel(GraceObject):
     _staticType = 'TickLabel'
     def __init__(self, parent,
                  onoff='on',
@@ -236,7 +236,7 @@ class TickLabel(base.GraceObject):
                  color=1,
                  **kwargs
                  ):
-        base.GraceObject.__init__(self, parent, locals())
+        GraceObject.__init__(self, parent, locals())
         self._formatting_template = {'offset_tup': '%.20f, %.20f'}
 
     def __setattr__(self, key, value):
@@ -256,7 +256,7 @@ class TickLabel(base.GraceObject):
         elif key == 'formula':
             self._check_type(str, key, value)
 
-        base.GraceObject.__setattr__(self, key, value)
+        GraceObject.__setattr__(self, key, value)
 
     def __str__(self):
         self.orientation = self.parent.orientation
@@ -282,7 +282,7 @@ class TickLabel(base.GraceObject):
 @    %(alt)s%(orientation)saxis ticklabel font %(font)s
 @    %(alt)s%(orientation)saxis ticklabel color %(color)s""" % self
 
-class Axis(base.GraceObject):
+class Axis(GraceObject):
     def __init__(self, parent,
                  orientation = 'x',
                  alt='',
@@ -296,7 +296,7 @@ class Axis(base.GraceObject):
         # for the axis object, the static type is determined by the orientation
         # and whether or not it is the alternative
         self._staticType = '%s%sAxis' % (alt, orientation)
-        base.GraceObject.__init__(self, parent, locals())
+        GraceObject.__init__(self, parent, locals())
         self.bar = AxisBar(self)
         self.label = AxisLabel(self)
         self.tick = Tick(self)
@@ -320,7 +320,7 @@ class Axis(base.GraceObject):
             self._check_type(str, key, value)
             self._check_membership(key, value, ('true', 'false'))
 
-        base.GraceObject.__setattr__(self, key, value)
+        GraceObject.__setattr__(self, key, value)
 
     def __str__(self):
 
@@ -370,7 +370,7 @@ class Axis(base.GraceObject):
             message = """
 scale must be either LINEAR_SCALE or LOGARITHMIC_SCALE.
 """
-            raise TypeError,message
+            raise TypeError(message)
 
     def set_format(self, format, precision=None):
         self.ticklabel.format = format
@@ -383,7 +383,7 @@ scale must be either LINEAR_SCALE or LOGARITHMIC_SCALE.
         """Automatically find the precision based on the format of the tick
         label.
         """
-        
+
         if self.ticklabel.format.lower()=="general":
             self.ticklabel.prec = 0 # doesn't matter
         elif self.ticklabel.format.lower()=="decimal":
